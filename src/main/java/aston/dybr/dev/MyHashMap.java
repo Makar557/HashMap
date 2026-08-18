@@ -79,8 +79,9 @@ public class MyHashMap<K, V> {
         return current != null ? current.value : null;
     }
 
-    public void remove(K key) {
+    public V remove(K key) {
         int index = calculateIndex(key);
+        V rez = null;
 
         Node<K, V> dummy = new Node<>(buckets[index]);
         Node<K, V> current = dummy;
@@ -91,11 +92,14 @@ public class MyHashMap<K, V> {
 
         if (current.next != null) {
 
+            rez = current.next.value;
             current.next = current.next.next;
             buckets[index] = dummy.next;
 
             size--;
         }
+
+        return rez;
     }
 
     private void resize() {
