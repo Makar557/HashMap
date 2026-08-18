@@ -33,11 +33,11 @@ public class MyHashMap<K, V> {
         buckets = new Node[DEFAULT_CAPACITY];
     }
 
-    public void put(K key, V value) {
-        put(key, value, false);
+    public V put(K key, V value) {
+        return put(key, value, false);
     }
 
-    private void put(K key, V value, boolean resizing) {
+    private V put(K key, V value, boolean resizing) {
 
         int index = calculateIndex(key);
 
@@ -57,10 +57,13 @@ public class MyHashMap<K, V> {
             if (size >= buckets.length * LOAD_FACTOR && !resizing) {
                 resize();
             }
-            return;
+            return null;
         }
 
+        V rez = current.next.value;
         current.next.value = value;
+
+        return rez;
     }
 
     public V get(K key) {
@@ -76,8 +79,9 @@ public class MyHashMap<K, V> {
         return current != null ? current.value : null;
     }
 
-    public void remove(K key) {
+    public V remove(K key) {
         int index = calculateIndex(key);
+        V rez = null;
 
         Node<K, V> dummy = new Node<>(buckets[index]);
         Node<K, V> current = dummy;
@@ -88,11 +92,14 @@ public class MyHashMap<K, V> {
 
         if (current.next != null) {
 
+            rez = current.next.value;
             current.next = current.next.next;
             buckets[index] = dummy.next;
 
             size--;
         }
+
+        return rez;
     }
 
     private void resize() {
@@ -111,6 +118,11 @@ public class MyHashMap<K, V> {
     }
 
     private int calculateIndex(K key) {
+
+        if (key == null) {
+            throw new IllegalArgumentException("Ключ не может быть null");
+        }
+
         int hash = key.hashCode();
 
         hash ^= hash >>> 16;
